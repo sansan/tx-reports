@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "-": "^0.0.1",
     "@chakra-ui/react": "^1.7.3",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
@@ -13,6 +14,8 @@
     "@types/node": "^16.7.13",
     "@types/react": "^17.0.20",
     "@types/react-dom": "^17.0.9",
+    "D": "^1.0.0",
+    "eslint-config-airbnb": "^19.0.2",
     "framer-motion": "^4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -25,7 +28,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint ."
   },
   "eslintConfig": {
     "extends": [
@@ -44,5 +48,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.4.1",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-prettier": "4.0.0",
+    "prettier": "2.5.1"
   }
 }
