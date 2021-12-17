@@ -1,11 +1,5 @@
 import React from 'react';
 
-function App() {
-  return (
-    <div>
-      clean
-    </div>
-  );
-}
+const App = () => <div>clean</div>;
 
 export default App;
