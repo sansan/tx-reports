@@ -1,20 +1,22 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Flex } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
 
-export const SideBar = () => {
-  useEffect(() => {
-    console.log('mount');
-  }, []);
+import { menuItems } from 'config/navigation';
+import { MenuItem } from 'components/molecules';
+
+export const SideBar: React.FC = () => {
+  const isOpen = false;
 
   return (
-    <Flex flexDirection="column" h="100%" as="ul">
-      <li>
-        <Link to="/">dash</Link>
-      </li>
-      <li>
-        <Link to="/reports">reports</Link>
-      </li>
+    <Flex
+      flexDirection="column"
+      h="100%"
+      w={`${isOpen ? '200px' : '80px'}`}
+      paddingLeft={5}
+    >
+      {menuItems.map(({ to, title, icon }) => (
+        <MenuItem key={to} to={to} title={title} icon={icon} />
+      ))}
     </Flex>
   );
 };
