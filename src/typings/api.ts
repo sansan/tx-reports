@@ -57,4 +57,4 @@ export type Payment = {
   created: string;
 };
 
-export type PaymentApiResponse = ApiResponse<Payment[]>;
+export type ReportApiResponse = ApiResponse<Payment[]>;
