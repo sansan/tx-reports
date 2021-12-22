@@ -6,7 +6,7 @@ import { DefaultLayout } from 'components/layouts';
 import Dashboard from './Dashboard';
 
 const Apps = lazy(() => import('./Apps'));
-const Reports = lazy(() => import('./Reports'));
+const Reports = lazy(() => import('./ReportPage'));
 const Monitor = lazy(() => import('./Monitor'));
 
 const PagesRouter = () => (
