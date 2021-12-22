@@ -2,7 +2,7 @@
 import { configureStore, ConfigureStoreOptions } from '@reduxjs/toolkit';
 
 import appSlice from './appSlice';
-import { reportsApi } from './reportsApi';
+import { reportsApi } from './ducks/api/slice';
 
 export const createStore = (
   options?: ConfigureStoreOptions['preloadedState'] | undefined

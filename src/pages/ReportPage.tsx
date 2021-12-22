@@ -6,7 +6,7 @@ import {
   useLazyGetReportQuery,
   useGetAllGatewaysQuery,
   useGetAllProjectsQuery,
-} from 'store/reportsApi';
+} from 'store/ducks/api/slice';
 
 import ReportPageTemplate from 'components/templates/ReportPage';
 

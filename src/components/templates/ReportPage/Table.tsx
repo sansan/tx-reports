@@ -3,7 +3,7 @@ import { Table, Tbody, Tr, Td } from '@chakra-ui/react';
 
 import { Payment } from 'typings';
 import { formatCurrency } from 'utils';
-import { useGetAllGatewaysQuery } from 'store/reportsApi';
+import { useGetAllGatewaysQuery } from 'store/ducks/api/slice';
 
 type TableProps = {
   data: Payment[];
