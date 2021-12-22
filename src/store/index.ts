@@ -2,6 +2,10 @@
 import { configureStore, ConfigureStoreOptions } from '@reduxjs/toolkit';
 
 import appSlice from './appSlice';
+import gateways from './ducks/gateways/slice';
+import payments from './ducks/payments/slice';
+import projects from './ducks/projects/slice';
+import report from './ducks/report/slice';
 import { reportsApi } from './ducks/api/slice';
 
 export const createStore = (
@@ -10,6 +14,10 @@ export const createStore = (
   configureStore({
     reducer: {
       appSlice,
+      gateways,
+      payments,
+      projects,
+      report,
       [reportsApi.reducerPath]: reportsApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
