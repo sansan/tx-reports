@@ -61,9 +61,11 @@ export const reportSlice = createSlice({
     ) => {
       state.expandTable[payload.id] = payload.value;
     },
+    resetReportSlice: () => initialState,
   },
 });
 
-export const { setQuery, setExpandTable } = reportSlice.actions;
+export const { setQuery, setExpandTable, resetReportSlice } =
+  reportSlice.actions;
 
 export default reportSlice.reducer;

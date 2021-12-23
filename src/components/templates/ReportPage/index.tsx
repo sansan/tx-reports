@@ -5,15 +5,15 @@ import { Flex, CircularProgress } from '@chakra-ui/react';
 import { useAppSelector } from 'hooks';
 import { selectHasData } from 'store/ducks/report/selectors';
 
-import { PageHeader } from 'components/molecules';
+import { PageHeader, EmptyPage } from 'components/molecules';
 
 import SearchForm from './SearchForm';
 import Report from './Report';
-import NoData from './NoData';
 
 type ReportPageTemplateProps = {
   isSuccess: boolean;
   isLoading: boolean;
+  isError: boolean;
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -23,6 +23,7 @@ const mapStateToProps = createStructuredSelector({
 const ReportPageTemplate: React.FC<ReportPageTemplateProps> = ({
   isSuccess,
   isLoading,
+  isError,
 }) => {
   const { hasData } = useAppSelector(mapStateToProps);
 
@@ -41,7 +42,16 @@ const ReportPageTemplate: React.FC<ReportPageTemplateProps> = ({
         <SearchForm isLoading={isLoading} />
       </Flex>
 
-      {!hasData && !isLoading && <NoData />}
+      {isError && <div>Errro</div>}
+
+      {!hasData && !isLoading && (
+        <EmptyPage
+          title="No reports"
+          subtitle="Currently you have no data for the reports to be generated.
+Once you start generating traffic through the Balance application 
+the reports will be shown."
+        />
+      )}
 
       {isLoading && (
         <CircularProgress value={59} size="100px" thickness="4px" />

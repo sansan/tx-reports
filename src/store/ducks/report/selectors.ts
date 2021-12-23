@@ -146,11 +146,7 @@ export const selectExpandState = createSelector(
 
 export const selectIsContainerOpen = createSelector(
   [selectExpandState, (_state, id: string) => id],
-  (expandState, id) => {
-    console.log(expandState, id);
-
-    return expandState[id];
-  }
+  (expandState, id) => expandState[id]
 );
 
 export const selectChartData = createSelector(

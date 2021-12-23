@@ -1,7 +1,6 @@
 /* eslint-disable import/no-named-as-default */
 import { configureStore, ConfigureStoreOptions } from '@reduxjs/toolkit';
 
-import appSlice from './appSlice';
 import gateways from './ducks/gateways/slice';
 import payments from './ducks/payments/slice';
 import projects from './ducks/projects/slice';
@@ -13,7 +12,6 @@ export const createStore = (
 ) =>
   configureStore({
     reducer: {
-      appSlice,
       gateways,
       payments,
       projects,
