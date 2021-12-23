@@ -1,17 +1,32 @@
 /* eslint-disable no-param-reassign */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  PayloadAction,
+  createEntityAdapter,
+} from '@reduxjs/toolkit';
+
+import { Payment } from 'typings';
+import { reportsApi } from './ducks/api/slice';
 
 export interface AppState {
   value: number;
+  payments: Payment[];
 }
 
 const initialState: AppState = {
   value: 0,
+  payments: [],
 };
+
+const adapter = createEntityAdapter<Payment>({
+  selectId: ({ paymentId }) => paymentId,
+  sortComparer: (a, b) =>
+    new Date(a.created).valueOf() - new Date(b.created).valueOf(),
+});
 
 export const appSlice = createSlice({
   name: 'counter',
-  initialState,
+  initialState: adapter.getInitialState(initialState),
   reducers: {
     increment: (state) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
@@ -26,6 +41,14 @@ export const appSlice = createSlice({
     incrementByAmount: (state, action: PayloadAction<number>) => {
       state.value += action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      reportsApi.endpoints.getReport.matchFulfilled,
+      (state, { payload }) => {
+        adapter.upsertMany(state, payload);
+      }
+    );
   },
 });
 

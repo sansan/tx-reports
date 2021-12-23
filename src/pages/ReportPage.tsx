@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { createStructuredSelector } from 'reselect';
 
-import { ReportApiRequestBody, Project, Gateway } from 'typings';
-
+import { useAppSelector } from 'hooks';
+import { selectQuery, selectShouldFetch } from 'store/ducks/report/selectors';
 import {
   useLazyGetReportQuery,
   useGetAllGatewaysQuery,
@@ -10,53 +11,28 @@ import {
 
 import ReportPageTemplate from 'components/templates/ReportPage';
 
+const mapStateToProps = createStructuredSelector({
+  shouldFetch: selectShouldFetch,
+  query: selectQuery,
+});
+
 const ReportPage: React.FC = () => {
-  const [query, setQuery] = useState<ReportApiRequestBody>({});
-  const [expandedReport, setExpandedReport] = useState<Record<number, boolean>>(
-    { 0: true }
-  );
+  const { shouldFetch, query } = useAppSelector(mapStateToProps);
   const { from, to, projectId, gatewayId } = query;
   const [loadReportData, result] = useLazyGetReportQuery();
-  const { data: gateways, isLoading: isGatewaysLoading } =
-    useGetAllGatewaysQuery();
-  const { data: projects, isLoading: isProjectLoading } =
-    useGetAllProjectsQuery();
-  const gatewayMap = new Map<string, Gateway>();
-  const projectMap = new Map<string, Project>();
+  const { isLoading: isGatewaysLoading } = useGetAllGatewaysQuery();
+  const { isLoading: isProjectLoading } = useGetAllProjectsQuery();
 
-  gateways?.forEach((gateway) => {
-    gatewayMap.set(gateway.gatewayId, gateway);
-  });
-
-  projects?.forEach((project) => {
-    projectMap.set(project.projectId, project);
-  });
-
-  const { data, isSuccess, isFetching } = result;
+  const { isSuccess, isFetching } = result;
   const isLoading = isGatewaysLoading || isProjectLoading || isFetching;
 
   useEffect(() => {
-    if (typeof from !== 'undefined') {
+    if (shouldFetch) {
       loadReportData({ from, to, projectId, gatewayId });
-      setExpandedReport({ 0: true });
     }
-  }, [from, to, projectId, gatewayId, loadReportData]);
+  }, [from, to, projectId, gatewayId, loadReportData, shouldFetch]);
 
-  return (
-    <ReportPageTemplate
-      data={data}
-      query={query}
-      onGenerateReport={setQuery}
-      gateways={gateways}
-      projects={projects}
-      projectMap={projectMap}
-      gatewayMap={gatewayMap}
-      isSuccess={isSuccess}
-      isLoading={isLoading}
-      expandedReport={expandedReport}
-      setExpandedReport={setExpandedReport}
-    />
-  );
+  return <ReportPageTemplate isSuccess={isSuccess} isLoading={isLoading} />;
 };
 
 export default ReportPage;

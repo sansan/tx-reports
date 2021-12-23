@@ -4,17 +4,9 @@ import { createSlice } from '@reduxjs/toolkit';
 import { reportsApi } from '../api/slice';
 import gatewayAdapter from './adapter';
 
-export interface AppState {
-  value: number;
-}
-
-const initialState: AppState = {
-  value: 0,
-};
-
 export const gatewaysSlice = createSlice({
   name: 'gateways',
-  initialState: gatewayAdapter.getInitialState(initialState),
+  initialState: gatewayAdapter.getInitialState(),
   reducers: {},
   extraReducers: (builder) => {
     builder.addMatcher(

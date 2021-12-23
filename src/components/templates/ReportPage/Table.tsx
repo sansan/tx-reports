@@ -1,38 +1,45 @@
 import React from 'react';
+import { createStructuredSelector } from 'reselect';
 import { Table, Tbody, Tr, Td } from '@chakra-ui/react';
 
-import { Payment } from 'typings';
+import { useAppSelector } from 'hooks';
 import { formatCurrency } from 'utils';
-import { useGetAllGatewaysQuery } from 'store/ducks/api/slice';
+import {
+  selectShowGatewayInTable,
+  selectDataWithGroupKeyId,
+} from 'store/ducks/report/selectors';
+import { selectGatewayEntities } from 'store/ducks/gateways/selectors';
 
 type TableProps = {
-  data: Payment[];
-  showGatewayId: boolean;
+  groupId: string;
 };
 
 const shortId = (id: string) => id.slice(-4);
 
-const DataTable: React.FC<TableProps> = ({ data, showGatewayId }) => {
-  const { data: gateways } = useGetAllGatewaysQuery();
-  const myMap = new Map<string, string>();
+const mapStateToProps = createStructuredSelector({
+  gatewayMap: selectGatewayEntities,
+  showGateway: selectShowGatewayInTable,
+  data: (state, groupId) => selectDataWithGroupKeyId(state, groupId),
+});
 
-  gateways?.forEach(({ gatewayId, name }) => {
-    myMap.set(gatewayId, name);
-  });
+const DataTable: React.FC<TableProps> = ({ groupId }) => {
+  const { gatewayMap, showGateway, data } = useAppSelector((state) =>
+    mapStateToProps(state, { groupId })
+  );
 
   return (
     <Table>
       <Tbody>
         <Tr>
           <Td>Date</Td>
-          {showGatewayId && <Td>Gateway ID</Td>}
+          {showGateway && <Td>Gateway ID</Td>}
           <Td>Transaction ID</Td>
           <Td isNumeric>Amount</Td>
         </Tr>
         {data.map(({ created, paymentId, amount, gatewayId }) => (
           <Tr key={paymentId}>
             <Td>{created}</Td>
-            {showGatewayId && <Td>{myMap.get(gatewayId)}</Td>}
+            {showGateway && <Td>{gatewayMap[gatewayId]?.name}</Td>}
             <Td>{shortId(paymentId)}</Td>
             <Td>{formatCurrency(amount)}</Td>
           </Tr>

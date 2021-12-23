@@ -1,23 +1,21 @@
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
-import projectsAdaptor from './adapter';
-
-export interface AppState {
-  value: number;
-}
-
-const initialState: AppState = {
-  value: 0,
-};
+import { reportsApi } from '../api/slice';
+import projectsAdapter from './adapter';
 
 export const projectsSlice = createSlice({
   name: 'projects',
-  initialState: projectsAdaptor.getInitialState(initialState),
+  initialState: projectsAdapter.getInitialState(),
   reducers: {},
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      reportsApi.endpoints.getAllProjects.matchFulfilled,
+      (state, { payload }) => {
+        projectsAdapter.upsertMany(state, payload);
+      }
+    );
+  },
 });
-
-// Action creators are generated for each case reducer function
-// export const { increment, decrement, incrementByAmount } = appSlice.actions;
 
 export default projectsSlice.reducer;

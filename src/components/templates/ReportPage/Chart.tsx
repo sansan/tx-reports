@@ -1,19 +1,12 @@
 import React from 'react';
+
 import { Box, Text, HStack, Flex } from '@chakra-ui/react';
 import { PieChart } from 'react-minimal-pie-chart';
 
-import { Gateway, Project, Payment } from 'typings';
+import { useAppSelector } from 'hooks';
+import { selectChartData } from 'store/ducks/report/selectors';
+
 import { Container } from 'components/atoms';
-
-type ChartProps = {
-  data: Record<string, Payment[]>;
-  total: number;
-  groupKey: string;
-  gatewayMap: Map<string, Gateway>;
-  projectMap: Map<string, Project>;
-};
-
-const colors = ['#A259FF', '#6497B1', '#FFC107', '#F24E1E'];
 
 const defaultLabelStyle = {
   fontSize: '0.5rem',
@@ -22,42 +15,28 @@ const defaultLabelStyle = {
   fill: '#fff',
 };
 
-const Chart: React.FC<ChartProps> = ({
-  data,
-  total,
-  groupKey,
-  gatewayMap,
-  projectMap,
-}) => {
-  const legendKeys = Object.keys(data).map((v) =>
-    groupKey === 'projectId' ? projectMap.get(v)?.name : gatewayMap.get(v)?.name
-  );
-  const chartData = Object.keys(data).map((key, index) => {
-    const value =
-      data[key].reduce((prev, { amount }) => prev + amount, 0) / total;
+const Chart: React.FC = () => {
+  const chartData = useAppSelector(selectChartData);
 
-    return {
-      title: key,
-      value,
-      color: colors[index] || '#fafafa',
-    };
-  });
+  if (!chartData) {
+    return null;
+  }
 
   return (
     <Box>
       <Container w="100%">
         <HStack w="100%" gridGap="2rem 1rem" wrap="wrap">
-          {legendKeys.map((key, i) => (
+          {chartData.map(({ title, color }) => (
             <Flex alignItems="center">
               <Box
                 h="16px"
                 w="16px"
                 borderRadius={5}
-                bg={colors[i]}
+                bg={color}
                 marginRight="0.75rem"
               />
               <Text as="span" color="text.primary">
-                {key}
+                {title}
               </Text>
             </Flex>
           ))}

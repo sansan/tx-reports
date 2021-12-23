@@ -1,16 +1,23 @@
 import { createSelector } from '@reduxjs/toolkit';
+
+import { chartColors } from 'config/theme';
 import type { RootState } from 'store';
 
 import { Payment } from 'typings';
 
-import { selectAllPayments } from '../payments/selectors';
-import { selectProjectEntities } from '../projects/selectors';
-import { selectGatewayEntities } from '../gateways/selectors';
+import { selectAllPayments, selectTotalPayments } from '../payments/selectors';
+import { selectProjectEntities, selectProjectIds } from '../projects/selectors';
+import { selectGatewayEntities, selectGatewayIds } from '../gateways/selectors';
 
 const selectReportSlice = (state: RootState) => state.report;
 
 const aggregateAmount = (aggregateValue: number, { amount }: Payment) =>
   aggregateValue + amount;
+
+export const selectShouldFetch = createSelector(
+  selectReportSlice,
+  ({ shouldFetch }) => shouldFetch
+);
 
 export const selectQuery = createSelector(
   selectReportSlice,
@@ -25,6 +32,16 @@ export const selectGroupKey = createSelector(
 export const selectShowChart = createSelector(
   selectReportSlice,
   (state) => state.showChart
+);
+
+export const selectShowGatewayInTable = createSelector(
+  selectQuery,
+  ({ gatewayId, projectId }) => !gatewayId && !projectId
+);
+
+export const selectHasData = createSelector(
+  selectTotalPayments,
+  (number) => !!number
 );
 
 export const selectTableTitle = createSelector(
@@ -52,31 +69,96 @@ export const selectTableTitle = createSelector(
   }
 );
 
-export const selectTotalRowTitle = createSelector(
+export const selectTotalAmount = createSelector(selectAllPayments, (payments) =>
+  payments.reduce(aggregateAmount, 0)
+);
+
+export const selectTotalPerProject = createSelector(
+  selectAllPayments,
+  selectProjectIds,
+  (payments, projectIds) =>
+    projectIds.map((projectId) => ({
+      projectId,
+      total: payments
+        .filter((payment) => payment.projectId === projectId)
+        .reduce(aggregateAmount, 0),
+    }))
+);
+
+export const selectTotalPerGateway = createSelector(
+  selectAllPayments,
+  selectGatewayIds,
+  (payments, gatewayIds) =>
+    gatewayIds.map((gatewayId) => ({
+      gatewayId,
+      total: payments
+        .filter((payment) => payment.gatewayId === gatewayId)
+        .reduce(aggregateAmount, 0),
+    }))
+);
+
+export const selectTableTotalRowTitle = createSelector(
   selectQuery,
-  selectProjectEntities,
-  selectGatewayEntities,
-  (query, projectMap, gatewayMap) => {
+  selectTotalAmount,
+  (query, total) => {
     const { projectId, gatewayId } = query;
-    let projectTitle;
-    let gatewayTitle;
+    let start;
 
-    if (projectId && gatewayId) {
-      return 'TOTAL';
+    if (projectId && !gatewayId) {
+      start = 'PROJECT ';
     }
 
-    if (projectId) {
-      projectTitle = projectMap[projectId]?.name;
+    if (gatewayId && !projectId) {
+      start = 'GATEWAY ';
     }
 
-    if (gatewayId) {
-      gatewayTitle = gatewayMap[gatewayId]?.name;
-    }
-
-    return `${projectTitle || gatewayTitle} | TOTAL`;
+    return `${start}TOTAL | ${new Intl.NumberFormat('en-US').format(
+      total
+    )} USD`;
   }
 );
 
-export const selectTotalAmount = createSelector(selectAllPayments, (payments) =>
-  payments.reduce(aggregateAmount, 0)
+export const selectDataWithGroupKeyId = createSelector(
+  [selectGroupKey, (_state, groupId: string) => groupId, selectAllPayments],
+  (groupKey, groupId, payments) => {
+    if (groupKey === 'gatewayId' && groupId) {
+      return payments.filter(({ gatewayId }) => gatewayId === groupId);
+    }
+
+    if (groupKey === 'projectId' && groupId) {
+      return payments.filter(({ projectId }) => projectId === groupId);
+    }
+
+    return payments;
+  }
+);
+
+export const selectChartData = createSelector(
+  [
+    selectGroupKey,
+    selectTotalAmount,
+    selectTotalPerGateway,
+    selectTotalPerProject,
+    selectProjectEntities,
+    selectGatewayEntities,
+  ],
+  (groupKey, grossTotal, totalPerGw, totalPerProj, projectMap, gatewayMap) => {
+    if (groupKey === 'projectId') {
+      return totalPerProj.map(({ projectId, total }, i) => ({
+        title: projectMap[projectId]!.name,
+        value: total / grossTotal,
+        color: chartColors[i] || '#fff',
+      }));
+    }
+
+    if (groupKey === 'gatewayId') {
+      return totalPerGw.map(({ gatewayId, total }, i) => ({
+        title: gatewayMap[gatewayId]!.name,
+        value: total / grossTotal,
+        color: chartColors[i] || '#fff',
+      }));
+    }
+
+    return null;
+  }
 );

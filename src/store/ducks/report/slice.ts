@@ -4,17 +4,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ReportApiRequestBody } from 'typings';
 
 export interface AppState {
-  value: number;
+  shouldFetch: boolean;
   query: ReportApiRequestBody;
-  groupKey: 'projectId' | 'gatewayId';
+  groupKey: 'projectId' | 'gatewayId' | null;
   showChart: boolean;
+  expandTable: Record<string, boolean>;
 }
 
 const initialState: AppState = {
-  value: 0,
+  shouldFetch: false,
   query: {},
   groupKey: 'projectId',
   showChart: false,
+  expandTable: {},
 };
 
 export const reportSlice = createSlice({
@@ -22,14 +24,27 @@ export const reportSlice = createSlice({
   initialState,
   reducers: {
     setQuery: (state, action: PayloadAction<ReportApiRequestBody>) => {
-      const { projectId, gatewayId } = action.payload;
+      const { projectId, gatewayId, from, to } = action.payload;
 
-      state.query = action.payload;
+      state.shouldFetch = true;
+
+      state.query = {
+        projectId: projectId!.length ? projectId : undefined,
+        gatewayId: gatewayId!.length ? gatewayId : undefined,
+        from: from!.length ? from : undefined,
+        to: to!.length ? to : undefined,
+      };
 
       if (projectId && !gatewayId) {
         state.groupKey = 'gatewayId';
-      } else {
+      }
+
+      if (!projectId && gatewayId) {
         state.groupKey = 'projectId';
+      }
+
+      if (projectId && gatewayId) {
+        state.groupKey = null;
       }
 
       if ((!projectId && gatewayId) || (projectId && !gatewayId)) {
@@ -37,6 +52,8 @@ export const reportSlice = createSlice({
       } else {
         state.showChart = false;
       }
+
+      state.expandTable = {};
     },
   },
 });

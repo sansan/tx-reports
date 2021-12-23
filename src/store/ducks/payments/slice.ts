@@ -1,23 +1,24 @@
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
-import paymentsAdaptor from './adapter';
-
-export interface AppState {
-  value: number;
-}
-
-const initialState: AppState = {
-  value: 0,
-};
+import { reportsApi } from '../api/slice';
+import paymentsAdapter from './adapter';
 
 export const paymentsSlice = createSlice({
   name: 'payments',
-  initialState: paymentsAdaptor.getInitialState(initialState),
+  initialState: paymentsAdapter.getInitialState(),
   reducers: {
     clearPaymentData: (state) => {
-      paymentsAdaptor.removeAll(state);
+      paymentsAdapter.removeAll(state);
     },
+  },
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      reportsApi.endpoints.getReport.matchFulfilled,
+      (state, { payload }) => {
+        paymentsAdapter.upsertMany(state, payload);
+      }
+    );
   },
 });
 

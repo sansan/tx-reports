@@ -1,72 +1,34 @@
 import React from 'react';
-import { groupBy, orderBy } from 'lodash';
-import { Heading, Collapse, Box, Stack } from '@chakra-ui/react';
+import { createStructuredSelector } from 'reselect';
+import { Heading, Box, Stack } from '@chakra-ui/react';
 
-import { Payment, ReportApiRequestBody, Project, Gateway } from 'typings';
-import { formatCurrency } from 'utils';
+import { useAppSelector } from 'hooks';
+import {
+  selectTableTitle,
+  selectShowChart,
+  selectGroupKey,
+  selectTableTotalRowTitle,
+} from 'store/ducks/report/selectors';
+import { selectAllProjects } from 'store/ducks/projects/selectors';
+import { selectAllGateways } from 'store/ducks/gateways/selectors';
 
 import { Container } from 'components/atoms';
 
-import DataTable from './Table';
+import DataGroup from './DataGroup';
 import Chart from './Chart';
 
-type ReportProps = {
-  data?: Payment[];
-  query: ReportApiRequestBody;
-  expandedReport: Record<number, boolean>;
-  setExpandedReport: Function;
-  projectMap: Map<string, Project>;
-  gatewayMap: Map<string, Gateway>;
-};
+const mapStateToProps = createStructuredSelector({
+  reportTitle: selectTableTitle,
+  showChart: selectShowChart,
+  groupKey: selectGroupKey,
+  projects: selectAllProjects,
+  gateways: selectAllGateways,
+  totalTitle: selectTableTotalRowTitle,
+});
 
-const Report: React.FC<ReportProps> = ({
-  data,
-  query,
-  expandedReport,
-  setExpandedReport,
-  projectMap,
-  gatewayMap,
-}) => {
-  const { projectId, gatewayId } = query;
-  const showChart = projectId && gatewayId ? false : projectId || gatewayId;
-
-  if (!data?.length) {
-    return null;
-  }
-  let groupKey = 'projectId';
-
-  if (projectId && !gatewayId) {
-    groupKey = 'gatewayId';
-  }
-
-  const gatewayName = gatewayId
-    ? gatewayMap.get(gatewayId)?.name
-    : 'All projects';
-  const projectName = projectId
-    ? projectMap.get(projectId)?.name
-    : 'All Gateways';
-
-  const title = `${projectName} | ${gatewayName}`;
-  const total = data.reduce((prev, { amount }) => prev + amount, 0);
-  const totalTitle = `${projectId && !gatewayId ? 'PROJECT' : ''}${
-    gatewayId && !projectId ? 'GATEWAY' : ''
-  } TOTAL`;
-  const arrangedData = groupBy(orderBy(data, ['created'], ['asc']), groupKey);
-
-  const handleExpandReport = (index: number) => {
-    if (typeof expandedReport[index] === 'undefined') {
-      setExpandedReport({ ...expandedReport, [index]: true });
-
-      return;
-    }
-
-    setExpandedReport({ ...expandedReport, [index]: !expandedReport[index] });
-  };
-
-  const getRowTitle = (key: string) =>
-    groupKey === 'projectId'
-      ? projectMap.get(key)?.name
-      : gatewayMap.get(key)?.name;
+const Report: React.FC = () => {
+  const { reportTitle, showChart, groupKey, projects, gateways, totalTitle } =
+    useAppSelector(mapStateToProps);
 
   return (
     <Stack
@@ -76,43 +38,20 @@ const Report: React.FC<ReportProps> = ({
     >
       <Container w="100%">
         <Heading size="sm" mb="2rem">
-          {title}
+          {reportTitle}
         </Heading>
-
-        {Object.keys(arrangedData).map((key, index) => (
-          <React.Fragment key={key}>
-            {(!projectId || !gatewayId) && (
-              <Container
-                variant="secondary"
-                onClick={() => handleExpandReport(index)}
-                _notFirst={{ marginTop: '5px' }}
-              >
-                {getRowTitle(key)}
-              </Container>
-            )}
-            <Collapse in={!!expandedReport[index]} animateOpacity>
-              <DataTable
-                data={arrangedData[key]}
-                showGatewayId={!(groupKey === 'gatewayId')}
-              />
-            </Collapse>
-          </React.Fragment>
-        ))}
+        {groupKey === 'projectId'
+          ? projects.map(({ projectId, name }) => (
+              <DataGroup key={projectId} title={name} id={projectId} />
+            ))
+          : gateways.map(({ gatewayId, name }) => (
+              <DataGroup key={gatewayId} title={name} id={gatewayId} />
+            ))}
       </Container>
       <Box w="100%">
-        {showChart && (
-          <Chart
-            data={arrangedData}
-            total={total}
-            groupKey={groupKey}
-            projectMap={projectMap}
-            gatewayMap={gatewayMap}
-          />
-        )}
+        {showChart && <Chart />}
         <Container>
-          <Heading size="sm">
-            {totalTitle} | {formatCurrency(total)} USD
-          </Heading>
+          <Heading size="sm">{totalTitle}</Heading>
         </Container>
       </Box>
     </Stack>

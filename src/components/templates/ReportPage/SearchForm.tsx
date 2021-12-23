@@ -1,5 +1,6 @@
 /* eslint-disable react/no-children-prop */
 import React, { useState, FC } from 'react';
+import { createStructuredSelector } from 'reselect';
 import {
   Box,
   Input,
@@ -11,33 +12,37 @@ import {
 } from '@chakra-ui/react';
 import { FaCalendar, FaCaretDown } from 'react-icons/fa';
 
-import { Gateway, Project } from 'typings';
+import { useAppDispatch, useAppSelector } from 'hooks';
+import { selectAllGateways } from 'store/ducks/gateways/selectors';
+import { selectAllProjects } from 'store/ducks/projects/selectors';
+import { setQuery } from 'store/ducks/report/slice';
 
 type SearchFormProps = {
-  onSubmit: Function;
   isLoading: boolean;
-  gateways?: Gateway[];
-  projects?: Project[];
 };
 
-const SearchForm: FC<SearchFormProps> = ({
-  onSubmit,
-  isLoading,
-  gateways,
-  projects,
-}) => {
+const mapStateToProps = createStructuredSelector({
+  gateways: selectAllGateways,
+  projects: selectAllProjects,
+});
+
+const SearchForm: FC<SearchFormProps> = ({ isLoading }) => {
+  const dispatch = useAppDispatch();
+  const { gateways, projects } = useAppSelector(mapStateToProps);
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [selectedGateway, setSelectedGateway] = useState<string>('');
   const [from, setFrom] = useState<string>('');
   const [to, setTo] = useState<string>('');
 
   const loadReport = () => {
-    onSubmit({
-      projectId: selectedProject,
-      gatewayId: selectedGateway,
-      from,
-      to,
-    });
+    dispatch(
+      setQuery({
+        projectId: selectedProject,
+        gatewayId: selectedGateway,
+        from,
+        to,
+      })
+    );
   };
 
   return (
@@ -105,11 +110,6 @@ const SearchForm: FC<SearchFormProps> = ({
       </Button>
     </Stack>
   );
-};
-
-SearchForm.defaultProps = {
-  gateways: [],
-  projects: [],
 };
 
 export default SearchForm;

@@ -1,5 +1,7 @@
 import { extendTheme } from '@chakra-ui/react';
 
+export const chartColors = ['#A259FF', '#6497B1', '#FFC107', '#F24E1E'];
+
 export const theme = extendTheme({
   styles: {
     global: {
