@@ -15,8 +15,7 @@ import { FaCalendar, FaCaretDown } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import { selectAllGateways } from 'store/ducks/gateways/selectors';
 import { selectAllProjects } from 'store/ducks/projects/selectors';
-import { setQuery, resetReportSlice } from 'store/ducks/report/slice';
-import { clearPaymentData } from 'store/ducks/payments/slice';
+import { setQuery } from 'store/ducks/report/slice';
 
 type SearchFormProps = {
   isLoading: boolean;
@@ -36,8 +35,6 @@ const SearchForm: FC<SearchFormProps> = ({ isLoading }) => {
   const [to, setTo] = useState<string>('');
 
   const loadReport = () => {
-    dispatch(clearPaymentData());
-    dispatch(resetReportSlice());
     dispatch(
       setQuery({
         projectId: selectedProject,

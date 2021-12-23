@@ -53,10 +53,6 @@ export const selectTableTitle = createSelector(
     let projectTitle = 'All Projects';
     let gatewayTitle = 'All gateways';
 
-    if (!projectId && !gatewayId) {
-      return null;
-    }
-
     if (projectId) {
       projectTitle = projectMap[projectId]!.name;
     }

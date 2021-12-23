@@ -33,6 +33,7 @@ const DataGroup: React.FC<DataGroupProps> = ({ title, id }) => {
         variant="secondary"
         onClick={() => handleExpandReport(id)}
         _notFirst={{ marginTop: '5px' }}
+        cursor="pointer"
       >
         {title}
       </Container>

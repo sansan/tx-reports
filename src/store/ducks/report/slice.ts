@@ -28,18 +28,16 @@ export const reportSlice = createSlice({
 
       state.shouldFetch = true;
 
-      state.query = {
-        projectId: projectId!.length ? projectId : undefined,
-        gatewayId: gatewayId!.length ? gatewayId : undefined,
-        from: from!.length ? from : undefined,
-        to: to!.length ? to : undefined,
-      };
+      state.query.projectId = projectId!.length ? projectId : undefined;
+      state.query.gatewayId = gatewayId!.length ? gatewayId : undefined;
+      state.query.from = from!.length ? from : undefined;
+      state.query.to = to!.length ? to : undefined;
 
       if (projectId && !gatewayId) {
         state.groupKey = 'gatewayId';
       }
 
-      if (!projectId && gatewayId) {
+      if ((!projectId && gatewayId) || (!projectId && !gatewayId)) {
         state.groupKey = 'projectId';
       }
 
