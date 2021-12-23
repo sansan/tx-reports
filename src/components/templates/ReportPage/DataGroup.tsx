@@ -1,5 +1,10 @@
 import React from 'react';
+import { createStructuredSelector } from 'reselect';
 import { Collapse } from '@chakra-ui/react';
+
+import { useAppDispatch, useAppSelector } from 'hooks';
+import { setExpandTable } from 'store/ducks/report/slice';
+import { selectIsContainerOpen } from 'store/ducks/report/selectors';
 
 import { Container } from 'components/atoms';
 
@@ -10,9 +15,16 @@ type DataGroupProps = {
   id: string;
 };
 
+const mapStateToProps = createStructuredSelector({
+  isOpen: (state, id) => selectIsContainerOpen(state, id),
+});
+
 const DataGroup: React.FC<DataGroupProps> = ({ title, id }) => {
+  const dispatch = useAppDispatch();
+  const { isOpen } = useAppSelector((state) => mapStateToProps(state, id));
+
   const handleExpandReport = (i: string) => {
-    console.log(i);
+    dispatch(setExpandTable({ id: i, value: !isOpen }));
   };
 
   return (
@@ -24,7 +36,7 @@ const DataGroup: React.FC<DataGroupProps> = ({ title, id }) => {
       >
         {title}
       </Container>
-      <Collapse in={false} animateOpacity>
+      <Collapse in={isOpen} animateOpacity>
         <DataTable groupId={id} />
       </Collapse>
     </>

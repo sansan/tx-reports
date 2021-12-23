@@ -15,6 +15,7 @@ import { selectAllGateways } from 'store/ducks/gateways/selectors';
 import { Container } from 'components/atoms';
 
 import DataGroup from './DataGroup';
+import DataTable from './Table';
 import Chart from './Chart';
 
 const mapStateToProps = createStructuredSelector({
@@ -40,13 +41,17 @@ const Report: React.FC = () => {
         <Heading size="sm" mb="2rem">
           {reportTitle}
         </Heading>
-        {groupKey === 'projectId'
-          ? projects.map(({ projectId, name }) => (
-              <DataGroup key={projectId} title={name} id={projectId} />
-            ))
-          : gateways.map(({ gatewayId, name }) => (
-              <DataGroup key={gatewayId} title={name} id={gatewayId} />
-            ))}
+        {groupKey === 'projectId' &&
+          projects.map(({ projectId, name }) => (
+            <DataGroup key={projectId} title={name} id={projectId} />
+          ))}
+
+        {groupKey === 'gatewayId' &&
+          gateways.map(({ gatewayId, name }) => (
+            <DataGroup key={gatewayId} title={name} id={gatewayId} />
+          ))}
+
+        {!groupKey && <DataTable />}
       </Container>
       <Box w="100%">
         {showChart && <Chart />}

@@ -13,4 +13,4 @@ export const transformResponse = <T>({ code, data, error }: ApiResponse<T>) => {
 };
 
 export const formatCurrency = (amount: number) =>
-  (Math.round(amount * 100) / 100).toFixed(2);
+  new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 }).format(amount);

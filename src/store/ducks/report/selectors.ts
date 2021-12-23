@@ -69,8 +69,10 @@ export const selectTableTitle = createSelector(
   }
 );
 
-export const selectTotalAmount = createSelector(selectAllPayments, (payments) =>
-  payments.reduce(aggregateAmount, 0)
+export const selectTotalAmount = createSelector(
+  selectAllPayments,
+  selectQuery,
+  (payments) => payments.reduce(aggregateAmount, 0)
 );
 
 export const selectTotalPerProject = createSelector(
@@ -112,15 +114,19 @@ export const selectTableTotalRowTitle = createSelector(
       start = 'GATEWAY ';
     }
 
-    return `${start}TOTAL | ${new Intl.NumberFormat('en-US').format(
-      total
-    )} USD`;
+    return `${start || ''}TOTAL | ${new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 0,
+    }).format(total)} USD`;
   }
 );
 
 export const selectDataWithGroupKeyId = createSelector(
-  [selectGroupKey, (_state, groupId: string) => groupId, selectAllPayments],
-  (groupKey, groupId, payments) => {
+  [
+    selectGroupKey,
+    selectAllPayments,
+    (_state, { groupId }: { groupId: string | undefined }) => groupId,
+  ],
+  (groupKey, payments, groupId) => {
     if (groupKey === 'gatewayId' && groupId) {
       return payments.filter(({ gatewayId }) => gatewayId === groupId);
     }
@@ -130,6 +136,20 @@ export const selectDataWithGroupKeyId = createSelector(
     }
 
     return payments;
+  }
+);
+
+export const selectExpandState = createSelector(
+  selectReportSlice,
+  (slice) => slice.expandTable
+);
+
+export const selectIsContainerOpen = createSelector(
+  [selectExpandState, (_state, id: string) => id],
+  (expandState, id) => {
+    console.log(expandState, id);
+
+    return expandState[id];
   }
 );
 

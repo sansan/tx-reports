@@ -16,6 +16,7 @@ export const paymentsSlice = createSlice({
     builder.addMatcher(
       reportsApi.endpoints.getReport.matchFulfilled,
       (state, { payload }) => {
+        paymentsAdapter.removeAll(state);
         paymentsAdapter.upsertMany(state, payload);
       }
     );

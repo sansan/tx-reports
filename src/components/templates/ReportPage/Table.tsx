@@ -11,7 +11,7 @@ import {
 import { selectGatewayEntities } from 'store/ducks/gateways/selectors';
 
 type TableProps = {
-  groupId: string;
+  groupId?: string | undefined;
 };
 
 const shortId = (id: string) => id.slice(-4);
@@ -47,6 +47,10 @@ const DataTable: React.FC<TableProps> = ({ groupId }) => {
       </Tbody>
     </Table>
   );
+};
+
+DataTable.defaultProps = {
+  groupId: undefined,
 };
 
 export default DataTable;

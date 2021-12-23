@@ -55,9 +55,15 @@ export const reportSlice = createSlice({
 
       state.expandTable = {};
     },
+    setExpandTable: (
+      state,
+      { payload }: PayloadAction<{ id: string; value: boolean }>
+    ) => {
+      state.expandTable[payload.id] = payload.value;
+    },
   },
 });
 
-export const { setQuery } = reportSlice.actions;
+export const { setQuery, setExpandTable } = reportSlice.actions;
 
 export default reportSlice.reducer;

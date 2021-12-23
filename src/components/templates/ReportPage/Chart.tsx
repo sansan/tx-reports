@@ -27,7 +27,7 @@ const Chart: React.FC = () => {
       <Container w="100%">
         <HStack w="100%" gridGap="2rem 1rem" wrap="wrap">
           {chartData.map(({ title, color }) => (
-            <Flex alignItems="center">
+            <Flex alignItems="center" key={title}>
               <Box
                 h="16px"
                 w="16px"
