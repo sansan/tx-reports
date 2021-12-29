@@ -57,7 +57,7 @@ the reports will be shown."
         <CircularProgress value={59} size="100px" thickness="4px" />
       )}
 
-      {isSuccess && <Report />}
+      {hasData && isSuccess && <Report />}
     </Flex>
   );
 };
